@@ -2,29 +2,45 @@ name: continuous-integration
 
 on:
     push:
-        branche-ignore: [ga-ignore-*]
+        branches-ignore: [ga-ignore-*]
     pull_request:
-        branche-ignore: [ga-ignore-*]
+        branches-ignore: [ga-ignore-*]
 
 jobs:
     coding-style:
         name: Run Banana
-        runs-on: Ubuntu-latest
+        runs-on: ubuntu-latest
         container:
-            image: ghor.io/epitech/coding-style-checker:latest7
+            image: ghcr.io/epitech/coding-style-checker:latest
         steps:
             - name: Checkout GH repo
               uses: actions/checkout@master
 
-            - name: Run cooding-style checker
+            - name: Run coding-style checker
               run: check.sh $(pwd) $(pwd)
             
             - name: Report banana result
               run: |
                 NB_ERROR=$(cat coding-style-reports.log | wc -l)
-                if [ $NB_ERROR -gt 0]; then
+                if [ $NB_ERROR -gt 0 ]; then
                   ERROR=$(cat coding-style-reports.log)
                   echo "::error title=$NB_ERROR errors found::$ERROR"
                   exit 1
                 fi
                 exit 0
+
+    compile:
+        runs-on: ubuntu-latest
+        steps:
+
+          - name: Checkout GH repo
+            uses: actions/checkout@v4
+          
+          - name: Check binary presence
+            run: |
+              if [ ! -f ./swapcase ]; then
+                echo "::error file=swpacase,
+                title=Binary not found"
+                exit 1
+              fi
+              exit 0
