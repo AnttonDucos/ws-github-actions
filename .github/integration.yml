@@ -1,0 +1,30 @@
+name: continuous-integration
+
+on:
+    push:
+        branche-ignore: [ga-ignore-*]
+    pull_request:
+        branche-ignore: [ga-ignore-*]
+
+jobs:
+    coding-style:
+        name: Run Banana
+        runs-on: Ubuntu-latest
+        container:
+            image: ghor.io/epitech/coding-style-checker:latest7
+        steps:
+            - name: Checkout GH repo
+              uses: actions/checkout@master
+
+            - name: Run cooding-style checker
+              run: check.sh $(pwd) $(pwd)
+            
+            - name: Report banana result
+              run: |
+                NB_ERROR=$(cat coding-style-reports.log | wc -l)
+                if [ $NB_ERROR -gt 0]; then
+                  ERROR=$(cat coding-style-reports.log)
+                  echo "::error title=$NB_ERROR errors found::$ERROR"
+                  exit 1
+                fi
+                exit 0
